@@ -1,0 +1,40 @@
+version: "3.6"
+services:
+  gitlab:
+    image: "gitlab/gitlab-ee:16.0.9-ee.0"
+    container_name: gitlab-instance
+    restart: always
+    hostname: "gitlab.encacap.com"
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://localhost:2080'
+        gitlab_rails['gitlab_shell_ssh_port'] = 2022
+    ports:
+      - "2080:2080"
+      - "2022:22"
+      - "2043:443"
+    volumes:
+      - "/srv/gitlab/config:/etc/gitlab"
+      - "/srv/gitlab/logs:/var/log/gitlab"
+      - "/srv/gitlab/data:/var/opt/gitlab"
+    shm_size: "256mb"
+    networks:
+      - gitlab-network
+
+  runner:
+    image: "gitlab/gitlab-runner"
+    container_name: gitlab-runner
+    restart: always
+    volumes:
+      - "gitlab-runner-config:/etc/gitlab-runner"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - gitlab-network
+
+volumes:
+  gitlab-runner-config:
+
+networks:
+  gitlab-network:
+    driver: bridge
+    external: true
