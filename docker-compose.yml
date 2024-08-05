@@ -1,9 +1,8 @@
-version: "3.6"
 services:
-  gitlab:
+  instance:
     image: "gitlab/gitlab-ee:16.0.9-ee.0"
     container_name: gitlab-instance
-    restart: always
+    restart: unless-stopped
     hostname: "gitlab.encacap.com"
     environment:
       GITLAB_OMNIBUS_CONFIG: |
@@ -24,15 +23,16 @@ services:
   runner:
     image: "gitlab/gitlab-runner"
     container_name: gitlab-runner
-    restart: always
+    restart: unless-stopped
     volumes:
-      - "gitlab-runner-config:/etc/gitlab-runner"
+      - "/srv/gitlab-runner:/etc/gitlab-runner"
       - "/var/run/docker.sock:/var/run/docker.sock"
     networks:
       - gitlab-network
 
 volumes:
-  gitlab-runner-config:
+  gitlab-instance:
+  gitlab-runner:
 
 networks:
   gitlab-network:
